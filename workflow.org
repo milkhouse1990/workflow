@@ -1,0 +1,498 @@
+#+TITLE: Workflow
+#+author: milkhouse
+#+property: header-args:elisp :tangle ~/.doom.d/config.el
+
+I am using Doom Emacs and Manjaro Linux now.
+
+* doom emacs module selection
+#+begin_src elisp :tangle ~/.doom.d/init.el
+
+;;; init.el -*- lexical-binding: t; -*-
+
+;; This file controls what Doom modules are enabled and what order they load
+;; in. Remember to run 'doom sync' after modifying it!
+
+(setq package-archives
+'(("gnu" . "http://elpa.emacs-china.org/gnu/")
+ ("melpa" . "http://elpa.emacs-china.org/melpa/")
+ ("org" . "http://elpa.emacs-china.org/org/")))
+
+(doom! :input
+       chinese
+       japanese
+       ;;layout            ; auie,ctsrnm is the superior home row
+
+       :completion
+       company ; the ultimate code completion backend
+       ;;helm              ; the *other* search engine for love and life
+       ;;ido               ; the other *other* search engine...
+       (ivy                              ; a search engine for love and life
+        +fuzzy
+        +prescient
+        +icons)
+       :ui
+       ;;deft              ; notational velocity for Emacs
+       doom                             ; what makes DOOM look the way it does
+       doom-dashboard                   ; a nifty splash screen for Emacs
+       ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
+       ;;(emoji +unicode)  ; 🙂
+       ;;fill-column       ; a `fill-column' indicator
+       hl-todo                ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+       ;;hydra
+       indent-guides     ; highlighted indent columns
+       ;;ligatures         ; ligatures and symbols to make your code pretty again
+       ;;minimap           ; show a map of the code on the side
+       modeline    ; snazzy, Atom-inspired modeline, plus API
+       ;;nav-flash         ; blink cursor line after big motions
+       ;;neotree           ; a project drawer, like NERDTree for vim
+       ophints                    ; highlight the region an operation acts on
+       ;; (popup +defaults)          ; tame sudden yet inevitable temporary windows
+       ;;tabs              ; a tab bar for Emacs
+       ;;treemacs          ; a project drawer, like neotree but cooler
+       ;;unicode           ; extended unicode support for various languages
+       vc-gutter        ; vcs diff in the fringe
+       vi-tilde-fringe  ; fringe tildes to mark beyond EOB
+       window-select     ; visually switch windows
+       workspaces       ; tab emulation, persistence & separate workspaces
+       ;;zen               ; distraction-free coding or writing
+
+       :editor
+       (evil +everywhere)             ; come to the dark side, we have cookies
+       file-templates                 ; auto-snippets for empty files
+       fold                           ; (nigh) universal code folding
+       ;;(format +onsave)  ; automated prettiness
+       ;;god               ; run Emacs commands without modifier keys
+       ;; lispy ; vim for lisp, for people who don't like vim
+       ;; multiple-cursors  ; editing in many places at once
+       ;;objed             ; text object editing for the innocent
+       ;;parinfer          ; turn lisp into python, sort of
+       ;;rotate-text       ; cycle region at point between text candidates
+       snippets   ; my elves. They type so I don't have to
+       ;;word-wrap         ; soft wrapping with language-aware indent
+
+       :emacs
+       (dired             ; making dired pretty [functional]
+        +ranger
+        +icons)
+       electric          ; smarter, keyword-based electric-indent
+       ;;ibuffer         ; interactive buffer management
+       undo              ; persistent, smarter undo for your inevitable mistakes
+       vc                ; version-control and Emacs, sitting in a tree
+
+       :term
+       ;;eshell            ; the elisp shell that works everywhere
+       ;;shell             ; simple shell REPL for Emacs
+       term              ; basic terminal emulator for Emacs
+       ;; vterm                            ; the best terminal emulation in Emacs
+
+       :checkers
+       ;; syntax              ; tasing you for every semicolon you forget
+       ;;spell             ; tasing you for misspelling mispelling
+       ;;grammar           ; tasing grammar mistake every you make
+
+       :tools
+       ;;ansible
+       debugger          ; FIXME stepping through code, to help you add bugs
+       ;;direnv
+       ;;docker
+       ;;editorconfig      ; let someone else argue about tabs vs spaces
+       ;; ein        ; tame Jupyter notebooks with emacs
+       (eval       ; run code, run (also, repls)
+        +overlay)
+       ;;gist              ; interacting with github gists
+       lookup     ; navigate your code and its documentation
+       lsp
+       magit      ; a git porcelain for Emacs
+       ;;make              ; run make tasks from Emacs
+       pass              ; password manager for nerds
+       ;;pdf        ; pdf enhancements
+       ;;prodigy    ; FIXME managing external services & code builders
+       ;;rgb               ; creating color strings
+       ;;taskrunner        ; taskrunner for all your projects
+       ;;terraform         ; infrastructure as code
+       ;;tmux              ; an API for interacting with tmux
+       ;;upload            ; map local to remote projects via ssh/ftp
+
+       :os
+       (:if IS-MAC macos)               ; improve compatibility with macOS
+       ;;tty               ; improve the terminal Emacs experience
+
+       :lang
+       ;;agda              ; types of types of types of types...
+       ;;cc                ; C/C++/Obj-C madness
+       ;;clojure           ; java with a lisp
+       ;;common-lisp       ; if you've seen one lisp, you've seen them all
+       ;;coq               ; proofs-as-programs
+       ;;crystal           ; ruby at the speed of c
+       ;;csharp            ; unity, .NET, and mono shenanigans
+       ;;data              ; config/data formats
+       ;;(dart +flutter)   ; paint ui and not much else
+       ;;elixir            ; erlang done right
+       ;;elm               ; care for a cup of TEA?
+       emacs-lisp                       ; drown in parentheses
+       ;;erlang            ; an elegant language for a more civilized age
+       ;;ess               ; emacs speaks statistics
+       ;;faust             ; dsp, but you get to keep your soul
+       ;;fsharp            ; ML stands for Microsoft's Language
+       ;;fstar             ; (dependent) types and (monadic) effects and Z3
+       ;;gdscript          ; the language you waited for
+      ;;(go +lsp)         ; the hipster dialect
+       ;;(haskell +dante)  ; a language that's lazier than I am
+       ;;hy                ; readability of scheme w/ speed of python
+       ;;idris             ; a language you can depend on
+       ;;json              ; At least it ain't XML
+       ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
+       ;;javascript        ; all(hope(abandon(ye(who(enter(here))))))
+       ;;julia                ; a better, faster MATLAB
+       ;;kotlin            ; a better, slicker Java(Script)
+       (latex                    ; writing papers in Emacs has never been so fun
+        +cdlatex
+        )
+       ;;lean
+       ;;factor
+       ;;ledger            ; an accounting system in Emacs
+       (lua               ; one-based indices? one-based indices
+        +lsp)
+       markdown          ; writing docs for people to ignore
+       ;;nim               ; python + lisp at the speed of c
+       ;;nix               ; I hereby declare "nix geht mehr!"
+       ;;ocaml             ; an objective camel
+       (org                             ; organize your plain life in plain text
+        +hugo
+        +roam
+        +pomodoro)
+       (python           ; beautiful is better than ugly
+        +lsp)
+       ;;qt                ; the 'cutest' gui framework ever
+       ;;racket            ; a DSL for DSLs
+       ;;raku              ; the artist formerly known as perl6
+       ;;rest              ; Emacs as a REST client
+       ;;rst               ; ReST in peace
+       ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;;scala             ; java, but good
+       ;;scheme            ; a fully conniving family of lisps
+       sh     ; she sells {ba,z,fi}sh shells on the C xor
+       ;;sml
+       ;;solidity          ; do you need a blockchain? No.
+       ;;swift             ; who asked for emoji variables?
+       ;;terra             ; Earth and Moon in alignment for performance.
+       web                              ; the tubes
+       ;;yaml              ; JSON, but readable
+
+       :email
+       ;;(mu4e +gmail)
+       ;;notmuch
+       ;;(wanderlust +gmail)
+
+       :app
+       ;;calendar
+       ;;irc               ; how neckbeards socialize
+       ;;(rss +org)        ; emacs as an RSS reader
+;;       twitter           ; twitter client https://twitter.com/vnought
+
+       :config
+       ;; literate
+       (default +bindings +smartparens))
+
+#+end_src
+
+* General configuration
+#+begin_src elisp
+(setq user-full-name "milkhouse"
+      user-mail-address "milkhouse1990@gmail.com")
+#+end_src
+* completion
+#+begin_src elisp
+(use-package! company-tng
+  :config
+  (map! :map company-active-map
+        "TAB" nil
+        [tab] nil
+        "M-n" nil
+        "M-p" nil
+        "C-j" nil
+        "C-k" nil))
+
+(use-package! yasnippet
+  :config
+  (map! :map yas-keymap
+        [tab] nil
+        "TAB" nil
+        "C-j" 'yas-next-field
+        "C-k" 'yas-prev-field))
+
+(setq company-idle-delay 0.1)
+#+end_src
+* ui
+#+begin_src elisp
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
+
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets.
+
+(setq doom-theme 'doom-one)
+
+(doom/set-frame-opacity 80)
+(setq display-line-numbers-type nil
+      which-key-idle-delay 0.3)
+#+end_src
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! nyan-mode)
+#+end_src
+#+begin_src elisp
+
+(use-package nyan-mode
+  :hook (after-init . nyan-mode)
+  :config
+  (setq nyan-cat-image
+      (create-image "~/my-pics/momoko-nyaa.xpm" 'xpm nil :ascent 'center)))
+
+#+end_src
+
+* editor
+#+begin_src elisp
+;; autosave
+(auto-save-visited-mode 1)
+(setq auto-save-visited-interval 1)
+
+;;(after! pdf-view
+  ;; (add-hook! 'pdf-view-mode-hook
+  ;;            (pdf-view-midnight-minor-mode)))
+;; Here are some additional functions/macros that could help you configure Doom:
+
+;; avy
+;; (global-set-key (kbd "C-;") 'avy-goto-char)
+
+#+end_src
+
+* input method
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! pyim :disable t)
+#+end_src
+
+#+RESULTS:
+| pyim |
+
+* lang
+** Python
+#+begin_src elisp :tangle  ~/.doom.d/packages.el
+(package! lpy)
+#+end_src
+#+begin_src elisp
+(after! python-mode
+(setq python-indent-offset 2))
+#+end_src
+** latex
+#+begin_src elisp
+(setq cdlatex-command-alist
+      '(("eq" "Insert display equation" "\$\$?\$\$" cdlatex-position-cursor nil t nil)
+        ("mat" "Insert bmatrix env" "\\begin{bmatrix}\n?\n\\end{bmatrix}\n" cdlatex-position-cursor nil t nil))
+      cdlatex-math-modify-alist
+      '((98 "\\boldsymbol" nil t nil nil)))
+#+end_src
+* org
+** gtd
+#+begin_src elisp
+(setq org-log-done 'time)
+#+end_src
+
+   #+RESULTS:
+   : time
+
+** book
+#+begin_src elisp
+(setq org-file-apps
+      '(("nes" . "mednafen %s")
+        ("nds" . "desmume %s")))
+
+(after! org-capture
+  (setq org-refile-targets
+        '(("~/org/archive.org" :level . 2))))
+
+(setq org-ref-default-bibliography '("~/refs/lib.bib")
+      org-ref-pdf-directory "~/refs/pdfs/"
+      ;; org-ref-bibliography-notes "~/refs/notes.org"
+      org-ref-notes-directory "~/refs/notes/"
+      )
+(defvar org-gitbook-output-directory "./build/")
+(defun org-export-gitbook ()
+  "Export all subtrees that are *not* tagged with :noexport: to
+  separate files.
+  Subtrees that do not have the :EXPORT_FILE_NAME: property set
+  are exported to a filename derived from the headline text."
+  (interactive)
+  (save-buffer)
+  (let ((modifiedp (buffer-modified-p)))
+    (save-excursion
+      (goto-char (point-min))
+      (goto-char (re-search-forward "^*"))
+      (set-mark (line-beginning-position))
+      (goto-char (point-max))
+      (if (and org-gitbook-output-directory (not (file-accessible-directory-p org-gitbook-output-directory)))
+          (mkdir org-gitbook-output-directory))
+      (org-map-entries
+       (lambda ()
+         (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
+           (unless export-file
+             (org-set-property
+              "EXPORT_FILE_NAME"
+              (replace-regexp-in-string " " "_" (nth 4 (org-heading-components)))))
+           (setq tempfile (org-entry-get (point) "EXPORT_FILE_NAME"))
+           (if org-gitbook-output-directory
+               (org-set-property
+                "EXPORT_FILE_NAME" (concat org-gitbook-output-directory tempfile)))
+           (deactivate-mark)
+           (org-md-export-to-markdown nil t nil)
+           (org-set-property "EXPORT_FILE_NAME" tempfile)
+           (set-buffer-modified-p modifiedp)))
+       "-noexport" 'region-start-level))))
+
+(defun org-build-gitbook-toc ()
+  (save-excursion
+    (set-mark (point-min))
+    (goto-char (point-max))
+    (setq current-export-file "")
+    (setq current-toc "")
+    (org-map-entries
+     (lambda ()
+       (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME"))
+             (heading-level (nth 0 (org-heading-components)))
+             (heading-name (nth 4 (org-heading-components))))
+         (if export-file
+             (setq current-export-file export-file))
+         (if (> heading-level 1)
+             ;; TODO This should just use org's list compilation functions. This is so gross. :|
+             (progn
+               (setq current-toc (concat current-toc
+                                         (format "%s- %s\n"
+                                                 (make-string (* (- heading-level 2) 2) ? )
+                                                  (concat "["
+                                                  heading-name "](" export-file ".md)"))))))))
+     "-noexport" 'region))
+  current-toc)
+
+(defun org-gitbook-build-toc ()
+  (interactive)
+  (let ((toc (org-build-gitbook-toc)))
+  (with-temp-file "./build/SUMMARY.md" (insert toc))))
+
+; TODO
+(defun my/org-game-archive ()
+  "When I finish a game, put my clock and closed info into archives"
+  (interactive)
+  (save-excursion
+    (when (not (org-at-heading-p))
+      (org-previous-visible-heading 1))
+    (set-mark (point))
+    (let* ((context (org-element-context))
+           (attrs (second context))
+           (heading-begin (plist-get attrs :begin))
+           (contents-begin (plist-get attrs :contents-begin))
+           (heading-end (- contents-begin 1)))
+      (message "%s %s" heading-begin heading-end)
+      (goto-char contents-begin)
+      (while
+          (let* ((ctx (org-element-context))
+                 (ele (first ctx))
+                 (prps (second ctx)))
+            (when (or (string= ele "planning")
+                      (and (string= ele "drawer")
+                           (string= (plist-get prps :drawer-name) "LOGBOOK")))
+              (goto-char (plist-get prps :end)))))
+      (set-mark (point))
+      (activate-mark)
+(org-refile))))
+#+end_src
+** knowledge management (slip-box)
+org-roam
+*** dependencies
+#+begin_src sh
+sudo pacman -S graphviz
+#+end_src
+** take notes
+*** watch video
+**** dependencies
+#+begin_src sh
+sudo pacman -S mpv
+#+end_src
+**** install and configure emacs package: org-media-note
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! org-media-note :recipe (:host github :repo "yuchen-lea/org-media-note"))
+#+end_src
+#+begin_src elisp
+(use-package! org-media-note
+  :hook (org-mode .  org-media-note-mode)
+  :bind (("s-m" . org-media-note-hydra/body)
+         :map org-media-note-hydra/keymap
+         ("j" . org-media-note-hydra/mpv-seek-forward)
+         ("k" . org-media-note-hydra/mpv-seek-backward))
+  :config
+  (setq org-media-note-screenshot-image-dir "~/org/roam/imgs/")
+  )
+#+end_src
+
+
+
+
+
+* key
+#+begin_src elisp
+(map! "C-SPC" nil)
+
+(setq doom-localleader-key ";")
+(map! :leader
+      :desc "Find file in other window"
+      ">" #'find-file-other-window)
+
+(map! "s-j" #'other-window)
+#+end_src
+
+#+RESULTS:
+
+* EAF
+#+begin_src elisp
+
+(use-package eaf
+  :load-path "~/.doom.d/site-lisp/emacs-application-framework" ; Set to "/usr/share/emacs/site-lisp/eaf" if installed from AUR
+  :general
+   (:states 'normal
+   :prefix doom-leader-key
+   "j" 'eaf-open-browser-with-history)
+  :init
+  (use-package epc :defer t)
+  (use-package ctable :defer t)
+  (use-package deferred :defer t)
+  (use-package s :defer t)
+  :custom
+  (eaf-browser-continue-where-left-off t)
+  :config
+  (eaf-setq eaf-browser-enable-adblocker "true")
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+
+  (setq eaf-proxy-type "http"
+	eaf-proxy-host "127.0.0.1"
+	eaf-proxy-port "43867"))
+
+(require 'eaf-evil)
+
+(define-key key-translation-map (kbd "SPC")
+  (lambda (prompt)
+    (if (derived-mode-p 'eaf-mode)
+	(pcase eaf--buffer-app-name
+	  ("browser" (if (string= (eaf-call-sync "call_function" eaf--buffer-id "is_focus") "True") (kbd "SPC") (kbd eaf-evil-leader-key)))
+	  (_ (kbd "SPC")))
+      (kbd "SPC"))))
+
+(require 'eaf-org)
+#+end_src
+
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! epc)
+;;(package! org-ref)
+#+end_src
