@@ -2,7 +2,30 @@
 #+author: milkhouse
 #+property: header-args:elisp :tangle ~/.doom.d/config.el
 
-I am using Doom Emacs and Manjaro Linux now.
+* scoop
+#+begin_src powershell
+Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+[environment]::setEnvironmentVariable('SCOOP','C:\scoop','User')
+Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+#+end_src
+
+* git
+#+begin_src powershell
+scoop install git
+git config --global url."https://github.com.cnpmjs.org".insteadOf https://github.com
+#+end_src
+
+* emacs
+I use Doom Emacs now.
+
+#+begin_src powershell
+[environment]::setEnvironmentVariable('HOME,'C:\Users\Administrator,'User')
+scoop bucket add extras
+scoop install emacs fd
+cd ~
+git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
+./.emacs.d/bin/doom install
+#+end_src
 
 * doom emacs module selection
 #+begin_src elisp :tangle ~/.doom.d/init.el
@@ -172,7 +195,7 @@ I am using Doom Emacs and Manjaro Linux now.
        ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;scheme            ; a fully conniving family of lisps
-       sh     ; she sells {ba,z,fi}sh shells on the C xor
+       (sh +powershell)     ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?
