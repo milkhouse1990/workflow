@@ -1,7 +1,10 @@
 #+TITLE: Workflow
 #+author: milkhouse
+#+startup: overview
 #+property: header-args:elisp :tangle ~/.doom.d/config.el
 
+* install
+office: word, visio
 * scoop
 #+begin_src powershell
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
@@ -177,16 +180,20 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
       cdlatex-math-modify-alist
       '((98 "\\boldsymbol" nil t nil nil)))
 #+end_src
-* org
-** gtd
+* gtd
 #+begin_src elisp
+;; I want to use English timestamps regardless my system locale.
 (setq system-time-locale "C")
+;; Log time when I have done something.
 (setq org-log-done 'time)
 #+end_src
 
-   #+RESULTS:
-   : time
-
+Before asleep, I will review my day. Use ~SPC o A a~ to see org agenda.
+#+begin_src elisp
+;; When I see my agenda, I would like to have ~log mode~ always on.
+(setq org-agenda-start-with-log-mode t)
+#+end_src
+* org
 ** book
 #+begin_src elisp
 (after! org-capture
