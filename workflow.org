@@ -5,6 +5,7 @@
 
 * install
 office: word, visio
+matlab
 * scoop
 #+begin_src powershell
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
@@ -139,8 +140,24 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
        ;;prodigy    ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
- Autosave
+       :lang
+       emacs-lisp
+       (latex +cdlatex)
+       (lua +lsp)
+       markdown
+       (org +hugo +roam +pomodoro)
+       (python +lsp)
+       (sh +powershell)
+       web
+       :config
+       (default +bindings +smartparens))
+#+end_src
+** General configurations
 #+begin_src elisp
+;; my info
+(setq user-full-name "milkhouse"
+      user-mail-address "milkhouse1990@gmail.com")
+
 ;; autosave
 (auto-save-visited-mode 1)
 (setq auto-save-visited-interval 1)
@@ -179,6 +196,10 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
         ("mat" "Insert bmatrix env" "\\begin{bmatrix}\n?\n\\end{bmatrix}\n" cdlatex-position-cursor nil t nil))
       cdlatex-math-modify-alist
       '((98 "\\boldsymbol" nil t nil nil)))
+#+end_src
+** MATLAB
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! matlab-mode)
 #+end_src
 * gtd
 #+begin_src elisp
