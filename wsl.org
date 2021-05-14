@@ -1,0 +1,333 @@
+#+TITLE: WSL
+#+PROPERTY: header-args:sh :tangle bootstrap.sh
+
+I use Manjaro Linux on my WSL2. The GUI feature of WSL2 is also available now.
+
+* git
+#+BEGIN_SRC sh
+# To speed up GitHub cloning speed.
+git config --global url."https://github.com.cnpmjs.org".insteadOf https://github.com
+#+END_SRC
+
+* zsh
+** Install
+#+begin_src sh
+# oh my zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# plugins
+sudo pacman -S zsh-syntax-highlighting zsh-autosuggestions
+#+end_src
+
+** Config
+#+BEGIN_SRC sh :tangle ~/.zshrc
+# Path to your oh-my-zsh installation.
+export ZSH="/home/milkhouse/.oh-my-zsh"
+
+# theme
+ZSH_THEME="robbyrussell"
+
+# Fix WSL2 GUI display issue.
+export DISPLAY=:0
+
+# My interface to install packages from different package managers.
+alias i="sudo pacman -S"
+#+END_SRC
+
+* fonts
+#+BEGIN_SRC sh
+# en: cascadia code cn: 思源黑体
+sudo pacman -S nerd-fonts-cascadia-code adobe-source-han-sans-cn-fonts
+#+END_SRC
+
+* Emacs
+I use Doom Emacs as my Emacs configuration framework.
+
+** Install (gccemacs)
+#+begin_src sh
+sudo pacman -S emacs-native-comp-git
+#+end_src
+
+** Configuration (Doom Emacs)
+*** Install
+#+begin_src sh
+git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
+./.emacs.d/bin/doom install
+#+end_src
+
+*** Doom module selection
+#+begin_src elisp :tangle ~/.doom.d/init.el
+;;; init.el -*- lexical-binding: t; -*-
+
+(doom! :input
+       :completion
+       company
+       (ivy +prescient +icons)
+
+       :ui
+       doom
+       doom-dashboard
+       hl-todo
+       indent-guides
+       modeline
+       ophints
+       vc-gutter
+       vi-tilde-fringe
+       window-select
+       workspaces
+
+       :editor
+       (evil +everywhere)
+       file-templates
+       fold
+       snippets   
+
+       :emacs
+       (dired +ranger +icons)
+       electric
+       undo
+       vc
+
+       :term
+       term
+
+       :checkers
+
+       :tools
+       debugger
+       (eval +overlay)
+       lookup
+       lsp
+       magit
+       biblio
+       pdf
+
+       :lang
+       emacs-lisp
+       (latex +cdlatex)
+       (lua +lsp)
+       markdown
+       (org +hugo +roam +pomodoro +noter)
+       (python +lsp)
+       (sh +powershell)
+       web
+
+       :config
+       (default +bindings +smartparens))
+#+end_src
+*** General configurations
+#+begin_src elisp
+;;; info
+(setq user-full-name "milkhouse"
+      user-mail-address "milkhouse1990@gmail.com")
+
+;;; UI
+;; theme and font
+(setq doom-theme 'doom-one')
+(setq doom-font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 16))
+
+;;; features
+;; autosave
+(auto-save-visited-mode 1)
+(setq auto-save-visited-interval 1)
+
+;;(after! pdf-view
+;; (add-hook! 'pdf-view-mode-hook
+;;            (pdf-view-midnight-minor-mode)))
+;; Here are some additional functions/macros that could help you configure Doom:
+
+;; avy
+;; (global-set-key (kbd "C-;") 'avy-goto-char)
+
+;;; keybinding
+(setq doom-localleader-key ";")
+(map! :leader
+      :desc "Find file in other window"
+      ">" #'find-file-other-window)
+#+end_src
+
+
+* lang
+** Python
+#+begin_src elisp
+(after! python-mode
+  (setq python-indent-offset 2))
+#+end_src
+** latex
+#+begin_src elisp
+(setq cdlatex-command-alist
+      '(("eq" "Insert display equation" "\$\$?\$\$" cdlatex-position-cursor nil t nil)
+        ("mat" "Insert bmatrix env" "\\begin{bmatrix}\n?\n\\end{bmatrix}\n" cdlatex-position-cursor nil t nil))
+      cdlatex-math-modify-alist
+      '((98 "\\boldsymbol" nil t nil nil)))
+#+end_src
+** MATLAB
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! matlab-mode)
+#+end_src
+#+begin_src elisp
+(after! matlab-mode
+  (setq matlab-indent-level 2))
+#+end_src
+
+* gtd
+#+begin_src elisp
+;; I want to use English timestamps regardless my system locale.
+(setq system-time-locale "C")
+;; Log time when I have done something.
+(setq org-log-done 'time)
+#+end_src
+
+Before asleep, I will review my day. Use ~SPC o A a~ to see org agenda.
+#+begin_src elisp
+;; When I see my agenda, I would like to have ~log mode~ always on.
+(setq org-agenda-start-with-log-mode t)
+#+end_src
+
+* org
+** book
+#+begin_src elisp
+(after! org-capture
+  (setq org-refile-targets
+        '(("~/org/archive.org" :level . 2))))
+
+(setq org-ref-default-bibliography '("~/refs/lib.bib")
+      org-ref-pdf-directory "~/refs/pdfs/"
+      ;; org-ref-bibliography-notes "~/refs/notes.org"
+      org-ref-notes-directory "~/refs/notes/"
+      )
+(defvar org-gitbook-output-directory "./build/")
+(defun org-export-gitbook ()
+  "Export all subtrees that are *not* tagged with :noexport: to
+  separate files.
+  Subtrees that do not have the :EXPORT_FILE_NAME: property set
+  are exported to a filename derived from the headline text."
+  (interactive)
+  (save-buffer)
+  (let ((modifiedp (buffer-modified-p)))
+    (save-excursion
+      (goto-char (point-min))
+      (goto-char (re-search-forward "^*"))
+      (set-mark (line-beginning-position))
+      (goto-char (point-max))
+      (if (and org-gitbook-output-directory (not (file-accessible-directory-p org-gitbook-output-directory)))
+          (mkdir org-gitbook-output-directory))
+      (org-map-entries
+       (lambda ()
+         (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
+           (unless export-file
+             (org-set-property
+              "EXPORT_FILE_NAME"
+              (replace-regexp-in-string " " "_" (nth 4 (org-heading-components)))))
+           (setq tempfile (org-entry-get (point) "EXPORT_FILE_NAME"))
+           (if org-gitbook-output-directory
+               (org-set-property
+                "EXPORT_FILE_NAME" (concat org-gitbook-output-directory tempfile)))
+           (deactivate-mark)
+           (org-md-export-to-markdown nil t nil)
+           (org-set-property "EXPORT_FILE_NAME" tempfile)
+           (set-buffer-modified-p modifiedp)))
+       "-noexport" 'region-start-level))))
+
+(defun org-build-gitbook-toc ()
+  (save-excursion
+    (set-mark (point-min))
+    (goto-char (point-max))
+    (setq current-export-file "")
+    (setq current-toc "")
+    (org-map-entries
+     (lambda ()
+       (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME"))
+             (heading-level (nth 0 (org-heading-components)))
+             (heading-name (nth 4 (org-heading-components))))
+         (if export-file
+             (setq current-export-file export-file))
+         (if (> heading-level 1)
+             ;; TODO This should just use org's list compilation functions. This is so gross. :|
+             (progn
+               (setq current-toc (concat current-toc
+                                         (format "%s- %s\n"
+                                                 (make-string (* (- heading-level 2) 2) ? )
+                                                 (concat "["
+                                                         heading-name "](" export-file ".md)"))))))))
+     "-noexport" 'region))
+  current-toc)
+
+(defun org-gitbook-build-toc ()
+  (interactive)
+  (let ((toc (org-build-gitbook-toc)))
+    (with-temp-file "./build/SUMMARY.md" (insert toc))))
+
+                                        ; TODO
+(defun my/org-game-archive ()
+  "When I finish a game, put my clock and closed info into archives"
+  (interactive)
+  (save-excursion
+    (when (not (org-at-heading-p))
+      (org-previous-visible-heading 1))
+    (set-mark (point))
+    (let* ((context (org-element-context))
+           (attrs (second context))
+           (heading-begin (plist-get attrs :begin))
+           (contents-begin (plist-get attrs :contents-begin))
+           (heading-end (- contents-begin 1)))
+      (message "%s %s" heading-begin heading-end)
+      (goto-char contents-begin)
+      (while
+          (let* ((ctx (org-element-context))
+                 (ele (first ctx))
+                 (prps (second ctx)))
+            (when (or (string= ele "planning")
+                      (and (string= ele "drawer")
+                           (string= (plist-get prps :drawer-name) "LOGBOOK")))
+              (goto-char (plist-get prps :end)))))
+      (set-mark (point))
+      (activate-mark)
+      (org-refile))))
+#+end_src
+** knowledge management (slip-box)
+org-roam
+*** dependencies
+#+begin_src powershell
+scoop install sqlite
+#+end_src
+#+begin_src sh
+sudo pacman -S graphviz
+#+end_src
+** take notes
+*** watch video
+**** dependencies
+#+begin_src sh
+sudo pacman -S mpv
+#+end_src
+**** install and configure emacs package: org-media-note
+#+begin_src elisp :tangle ~/.doom.d/packages.el
+(package! org-media-note :recipe (:host github :repo "yuchen-lea/org-media-note"))
+#+end_src
+#+begin_src elisp
+(use-package! org-media-note
+  :hook (org-mode .  org-media-note-mode)
+  :bind (("s-m" . org-media-note-hydra/body)
+         :map org-media-note-hydra/keymap
+         ("j" . org-media-note-hydra/mpv-seek-forward)
+         ("k" . org-media-note-hydra/mpv-seek-backward))
+  :config
+  (setq org-media-note-screenshot-image-dir "~/org/roam/imgs/")
+  )
+#+end_src
+
+
+
+
+
+* play games
+** Emulators
+#+begin_src powershell
+sudo pacman -S mednafen
+#+end_src
+
+** Start games in Emacs
+#+begin_src elisp
+(setq org-file-apps
+      '(("nes" . "mednafen %s")
+        ("nds" . "desmume %s")))
+#+end_src
