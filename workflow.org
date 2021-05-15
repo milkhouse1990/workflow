@@ -1,7 +1,6 @@
 #+TITLE: Workflow
 #+author: milkhouse
 #+startup: overview
-#+property: header-args:elisp :tangle ~/.doom.d/config.el
 
 * install
 office: word, visio

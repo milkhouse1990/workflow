@@ -1,10 +1,12 @@
 #+TITLE: WSL
 #+PROPERTY: header-args:sh :tangle bootstrap.sh
+#+PROPERTY: header-args:elisp :tangle ~/.doom.d/config.el
 
 I use Manjaro Linux on my WSL2. The GUI feature of WSL2 is also available now.
 
 * git
 #+BEGIN_SRC sh
+## git
 # To speed up GitHub cloning speed.
 git config --global url."https://github.com.cnpmjs.org".insteadOf https://github.com
 #+END_SRC
@@ -12,6 +14,7 @@ git config --global url."https://github.com.cnpmjs.org".insteadOf https://github
 * zsh
 ** Install
 #+begin_src sh
+## zsh
 # oh my zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 # plugins
@@ -23,18 +26,38 @@ sudo pacman -S zsh-syntax-highlighting zsh-autosuggestions
 # Path to your oh-my-zsh installation.
 export ZSH="/home/milkhouse/.oh-my-zsh"
 
-# theme
+# Set name of the theme to load.
 ZSH_THEME="robbyrussell"
+
+# Uncomment the following line to disable bi-weekly auto-update checks.
+DISABLE_AUTO_UPDATE="true"
+
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
+
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
 
 # Fix WSL2 GUI display issue.
 export DISPLAY=:0
 
+# Use OpenGL applications in WSL2.
+export LIBGL_ALWAYS_INDIRECT=0
+
 # My interface to install packages from different package managers.
 alias i="sudo pacman -S"
+
+# Enable zsh-syntax-highlighting and zsh-autosuggestions
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 #+END_SRC
 
 * fonts
 #+BEGIN_SRC sh
+## fonts
 # en: cascadia code cn: 思源黑体
 sudo pacman -S nerd-fonts-cascadia-code adobe-source-han-sans-cn-fonts
 #+END_SRC
@@ -44,12 +67,14 @@ I use Doom Emacs as my Emacs configuration framework.
 
 ** Install (gccemacs)
 #+begin_src sh
+## emacs
 sudo pacman -S emacs-native-comp-git
 #+end_src
 
 ** Configuration (Doom Emacs)
 *** Install
 #+begin_src sh
+# doom emacs
 git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
 ./.emacs.d/bin/doom install
 #+end_src
@@ -315,14 +340,21 @@ sudo pacman -S mpv
   )
 #+end_src
 
-
-
-
-
 * play games
 ** Emulators
-#+begin_src powershell
+*** Install
+#+begin_src sh
+## emulators
 sudo pacman -S mednafen
+# dependencies
+sudo pacman -S pulseaudio-alsa
+#+end_src
+
+*** Config
+#+begin_src sh
+# mednafen config
+mednafen -sound.device sexyal-literal-default
+mednafen -nes.input.port1.gamepad.a "keyboard 0x0 14" -nes.input.port1.gamepad.b "keyboard 0x0 13" -nes.input.port1.gamepad.down "keyboard 0x0 22" -nes.input.port1.gamepad.left "keyboard 0x0 4" -nes.input.port1.gamepad.rapid_a "keyboard 0x0 12" -nes.input.port1.gamepad.rapid_b "keyboard 0x0 24" -nes.input.port1.gamepad.right "keyboard 0x0 7" -nes.input.port1.gamepad.select "keyboard 0x0 11" -nes.input.port1.gamepad.start "keyboard 0x0 15" -nes.input.port1.gamepad.up "keyboard 0x0 26"
 #+end_src
 
 ** Start games in Emacs
