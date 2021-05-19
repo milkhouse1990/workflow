@@ -1,4 +1,5 @@
 #+TITLE: WSL
+#+STARTUP: overview
 #+PROPERTY: header-args:sh :tangle bootstrap.sh
 #+PROPERTY: header-args:elisp :tangle ~/.doom.d/config.el
 
@@ -9,6 +10,7 @@ I use Manjaro Linux on my WSL2. The GUI feature of WSL2 is also available now.
 ## git
 # To speed up GitHub cloning speed.
 git config --global url."https://github.com.cnpmjs.org".insteadOf https://github.com
+git config --global credential.helper store
 #+END_SRC
 
 * zsh
@@ -84,6 +86,8 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
 ;;; init.el -*- lexical-binding: t; -*-
 
 (doom! :input
+       chinese
+
        :completion
        company
        (ivy +prescient +icons)
@@ -104,7 +108,7 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
        (evil +everywhere)
        file-templates
        fold
-       snippets   
+       snippets
 
        :emacs
        (dired +ranger +icons)
@@ -116,6 +120,7 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
        term
 
        :checkers
+       syntax
 
        :tools
        debugger
@@ -141,14 +146,18 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
 #+end_src
 *** General configurations
 #+begin_src elisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
 ;;; info
 (setq user-full-name "milkhouse"
       user-mail-address "milkhouse1990@gmail.com")
 
 ;;; UI
 ;; theme and font
-(setq doom-theme 'doom-one')
+(setq doom-theme 'doom-one)
 (setq doom-font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 16))
+
+(setq display-line-numbers nil)
 
 ;;; features
 ;; autosave
@@ -170,7 +179,14 @@ git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
       ">" #'find-file-other-window)
 #+end_src
 
-
+* Chinese input method
+Enable ~chinese~ module in Doom Emacs.
+I use ~pyim~ now, because I don't want to play with ~dbus~ in WSL2.
+I need a big dictionary.
+#+begin_src elisp
+(setq pyim-dicts
+      '((:name "bigdict" :file "~/.doom.d/pyim-bigdict.pyim")))
+#+end_src
 * lang
 ** Python
 #+begin_src elisp
@@ -282,32 +298,6 @@ Before asleep, I will review my day. Use ~SPC o A a~ to see org agenda.
   (let ((toc (org-build-gitbook-toc)))
     (with-temp-file "./build/SUMMARY.md" (insert toc))))
 
-                                        ; TODO
-(defun my/org-game-archive ()
-  "When I finish a game, put my clock and closed info into archives"
-  (interactive)
-  (save-excursion
-    (when (not (org-at-heading-p))
-      (org-previous-visible-heading 1))
-    (set-mark (point))
-    (let* ((context (org-element-context))
-           (attrs (second context))
-           (heading-begin (plist-get attrs :begin))
-           (contents-begin (plist-get attrs :contents-begin))
-           (heading-end (- contents-begin 1)))
-      (message "%s %s" heading-begin heading-end)
-      (goto-char contents-begin)
-      (while
-          (let* ((ctx (org-element-context))
-                 (ele (first ctx))
-                 (prps (second ctx)))
-            (when (or (string= ele "planning")
-                      (and (string= ele "drawer")
-                           (string= (plist-get prps :drawer-name) "LOGBOOK")))
-              (goto-char (plist-get prps :end)))))
-      (set-mark (point))
-      (activate-mark)
-      (org-refile))))
 #+end_src
 ** knowledge management (slip-box)
 org-roam
@@ -362,4 +352,10 @@ mednafen -nes.input.port1.gamepad.a "keyboard 0x0 14" -nes.input.port1.gamepad.b
 (setq org-file-apps
       '(("nes" . "mednafen %s")
         ("nds" . "desmume %s")))
+#+end_src
+
+* Write novels
+#+begin_src elisp
+(use-package! ox-gitbook
+  :load-path "~/repos/ox-gitbook/")
 #+end_src
